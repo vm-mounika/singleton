@@ -29,7 +29,8 @@ script: >
     python3 ./check_headers.py -f "$(git diff --name-only --diff-filter=d $TRAVIS_COMMIT_RANGE)"
   fi &&
   if [ x${TEST} = xunit_test ]; then
-    - make test
+    make build
+    make test
   fi
  # fi &&
   # if [ x${TEST} = xcode_scan ]; then
