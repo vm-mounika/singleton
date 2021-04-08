@@ -30,6 +30,7 @@ script: >
   fi &&
   if [ x${TEST} = xunit_test ]; then
     make build
+    ls -ltr
     make test
   fi
  # fi &&
