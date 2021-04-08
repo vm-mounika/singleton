@@ -1,0 +1,48 @@
+language: go
+go:
+  - 1.13
+python:
+  - 3.4
+before_install:
+- |
+    git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '\.md$' || {
+      echo "Only docs were updated, stopping build process."
+      exit
+    }
+branches:
+  only:
+    - setup_CI
+jobs:
+  include:
+  - name: "Check Header"
+    env: TEST=check_header
+  - name: "Unit Test"
+    env: TEST=unit_test
+  # - name: "Code Scan"
+  #   env: TEST=code_scan
+  
+script: >
+  if [ x${TEST} = xcheck_header ]; then
+    git clone --branch=devops https://github.com/vmware/singleton.git devops
+    cp $TRAVIS_BUILD_DIR/devops/check_headers.py .
+    chmod +x check_headers.py
+    python3 ./check_headers.py -f "$(git diff --name-only --diff-filter=d $TRAVIS_COMMIT_RANGE)"
+  fi &&
+  if [ x${TEST} = xunit_test ]; then
+    - make test
+  fi
+ # fi &&
+  # if [ x${TEST} = xcode_scan ]; then
+  #   - make coverage
+  #   - apt-get update -y
+  #   - apt-get install zip unzip
+  #   - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/$SONARSCANNER.zip
+  #   - unzip $SONARSCANNER.zip && rm -f $SONARSCANNER.zip
+  #   - ./$SONARSCANNERINNER/bin/sonar-scanner -Dsonar.sources=. -Dsonar.exclusions=**/testdata/**/*,**/$SONARSCANNERINNER/**/*,**/bindata/bindata.go,tests/**,api/v1/**,api/v2/swagger/**,assets/**,cmd/**,bindata/**
+  #    -Dsonar.coverage.exclusions=**/testdata/**/*,**/$SONARSCANNERINNER/**/*,**/bindata/bindata.go,tests/**,api/v1/**,api/v2/swagger/**,assets/**,cmd/**,bindata/**
+  #     -Dsonar.projectName=g11n-service-golang
+  #     -Dsonar.projectKey=g11n-service-golang_key -Dsonar.host.url=http://10.148.61.14:9000/ -Dsonar.login=$SONAR_TOKEN
+  #      -Dsonar.go.coverage.reportPaths=./cover.out
+
+  # fi 
+  
