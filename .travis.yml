@@ -33,10 +33,9 @@ script: >
     make build
     ls -ltr builds
     make test
-  fi
- fi &&
+  fi &&
   if [ x${TEST} = xcode_scan ]; then
-   SONARSCANNER='sonar-scanner-cli-4.0.0.1744-linux'
+    SONARSCANNER='sonar-scanner-cli-4.0.0.1744-linux'
     SONARSCANNERINNER='sonar-scanner-4.0.0.1744-linux'
     wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/$SONARSCANNER.zip
     unzip $SONARSCANNER.zip
@@ -52,7 +51,7 @@ script: >
     echo $str Unit Test End $str
     git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '\.travis\.yml$' || {
       echo "No need to check sonar quality gate for only travis configuration updates"
-      exit
+      exit 
     }
     cd $TRAVIS_BUILD_DIR/devops/sonar && sleep 5 && python3 ./check_sonar_qualitygate.py -ProjectKeyPrefixArray=$SONAR_ORG-singleton-go-service-$TRAVIS_BRANCH -HostName=https://sonarcloud.io
   fi 
